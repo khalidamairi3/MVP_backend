@@ -51,12 +51,12 @@ def courses_api():
         return courses.delete()
 
 @app.route("/api/student-registers",methods=["POST","DELETE"])
-def login_api():
+def student_registers_api():
 
     if request.method=="POST":
-        return login.post()
+        return student_registers.post()
     elif request.method == "DELETE":
-        return login.delete()
+        return student_registers.delete()
 
 
 

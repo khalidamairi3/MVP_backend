@@ -17,7 +17,7 @@ def post():
         try:
             conn = mariadb.connect(user=dbcreds.user,password=dbcreds.password, host=dbcreds.host,port=dbcreds.port, database=dbcreds.database)
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE email = ? and password",[email,password])
+            cursor.execute("SELECT * FROM users WHERE email = ? and password =?",[email,password])
             user= cursor.fetchall()
             if len(user)==1 :
                 loginToken = secrets.token_urlsafe(16) 
