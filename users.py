@@ -71,7 +71,7 @@ def update():
         conn = mariadb.connect(user=dbcreds.user,password=dbcreds.password, host=dbcreds.host,port=dbcreds.port, database=dbcreds.database)
         cursor = conn.cursor()
         cursor.execute("SELECT user_id from user_session WHERE token = ?",[loginToken])
-        user_id = cursor.fecthone()[0]
+        user_id = cursor.fetchone()[0]
         if name != None and name!="" and user_id != None:
             cursor.execute("UPDATE users SET name =? WHERE id =?",[name,user_id])
         if birthdate != None and birthdate!="" and user_id != None:
@@ -131,7 +131,7 @@ def delete():
         conn = mariadb.connect(user=dbcreds.user,password=dbcreds.password, host=dbcreds.host,port=dbcreds.port, database=dbcreds.database)
         cursor = conn.cursor()
         cursor.execute("SELECT user_id from user_session WHERE token = ?",[loginToken])
-        user_id = cursor.fecthone()[0]
+        user_id = cursor.fetchone()[0]
         cursor.execute("DELETE FROM users WHERE id=?",[user_id])
         conn.commit()
         rows = cursor.rowcount

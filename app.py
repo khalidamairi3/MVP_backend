@@ -4,7 +4,7 @@ import mariadb
 import students
 import instructors
 import users
-
+import courses
 
 
 from flask_cors import CORS
@@ -27,6 +27,21 @@ def users_api():
         return users.post()
     elif request.method=="PATCH":
         return users.update()
+    elif request.method == "DELETE":
+        return users.delete()
+
+@app.route("/api/courses",methods=["GET","POST","PATCH","DELETE"])
+def courses_api():
+    if request.method == "GET":
+        return courses.get()
+    elif request.method=="POST":
+        return courses.post()
+    elif request.method=="PATCH":
+        return courses.update()
+    elif request.method == "DELETE":
+        return courses.delete()
+
+
 
 
 
