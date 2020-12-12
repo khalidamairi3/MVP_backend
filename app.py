@@ -5,12 +5,21 @@ import students
 import instructors
 import users
 import courses
+import login
+import student_registers
 
 
 from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+@app.route("/api/login",methods=["POST","DELETE"])
+def login_api():
+
+    if request.method=="POST":
+        return login.post()
+    elif request.method == "DELETE":
+        return login.delete()
 
 @app.route("/api/students",methods=["GET"])
 def students_api():
@@ -41,6 +50,13 @@ def courses_api():
     elif request.method == "DELETE":
         return courses.delete()
 
+@app.route("/api/student-registers",methods=["POST","DELETE"])
+def login_api():
+
+    if request.method=="POST":
+        return login.post()
+    elif request.method == "DELETE":
+        return login.delete()
 
 
 
