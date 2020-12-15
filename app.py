@@ -7,6 +7,7 @@ import users
 import courses
 import login
 import student_registers
+import student_submit
 import instructor_teaches
 import tasks
 
@@ -80,7 +81,17 @@ def tasks_api():
     elif request.method == "DELETE":
         return tasks.delete()
 
+@app.route("/api/submit",methods=["GET","POST","PATCH","DELETE"])
+def student_submit_api():
 
+    if request.method == "GET":
+        return student_submit.get()
+    elif request.method=="POST":
+        return student_submit.post()
+    elif request.method=="PATCH":
+        return student_submit.update()
+    elif request.method == "DELETE":
+        return student_submit.delete()
 
 
 
