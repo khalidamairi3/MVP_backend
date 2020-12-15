@@ -5,7 +5,45 @@ from flask import  Response, request
 import mariadb
 from datetime import date
 
+def get():
+    params=request.args
+    course_id = params.get("courseId")
+    conn = None
+    cursor = None
+    rows = None    
+    try:
+        conn = mariadb.connect(user=dbcreds.user,password=dbcreds.password, host=dbcreds.host,port=dbcreds.port, database=dbcreds.database)
+        cursor = conn.cursor()
+        if course_id !=None and course_id !="":
+            cursor.execute("SELECT * FROM tasks WHERE course_id=?",[course_id,])
+            rows = cursor.fetchall()
+    except mariadb.OperationalError as e:
+        message = "connection error" 
+    except Exception as e:
+        print(e)
+        message ="somthing went wrong, probably bad params " 
+    finally:
+        if(cursor != None):
+            cursor.close()
+        if(conn != None):
+            conn.rollback()
+            conn.close()
+        if (rows !=None or rows == []):
+            tasks=[]
+            for row in rows:
 
+                task={
+                    "id":row[0],
+                    "courseId":row[1],
+                    "type":row[2],
+                    "published_date":row[3],
+                    "due_date": row[4],
+                    "description":row[5]
+                }
+                tasks.append(task)
+            return Response(json.dumps(tasks,default=str) ,mimetype="application/json",status=201)
+        else:
+            return Response(message ,mimetype="html/text",status=400)
 
 def post():
     data=request.json
