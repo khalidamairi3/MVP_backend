@@ -8,6 +8,7 @@ import courses
 import login
 import student_registers
 import instructor_teaches
+import tasks
 
 from flask_cors import CORS
 app = Flask(__name__)
@@ -65,6 +66,21 @@ def instructor_teaches_api():
         return instructor_teaches.post()
     elif request.method == "DELETE":
         return instructor_teaches.delete()
+
+
+@app.route("/api/tasks",methods=["GET","POST","PATCH","DELETE"])
+def tasks_api():
+
+    if request.method == "GET":
+        return tasks.get()
+    elif request.method=="POST":
+        return tasks.post()
+    elif request.method=="PATCH":
+        return tasks.update()
+    elif request.method == "DELETE":
+        return tasks.delete()
+
+
 
 
 
