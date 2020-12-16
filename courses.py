@@ -47,7 +47,7 @@ def get():
                 courses.append(course)
             return Response(json.dumps(courses,default=str) ,mimetype="application/json",status=200)
         else:
-            return Response(message ,mimetype="html/text",status=400)
+            return Response("failed" ,mimetype="html/text",status=400)
 
 
 def post():
@@ -93,7 +93,7 @@ def post():
             }
             return Response(json.dumps(course,default=str) ,mimetype="application/json",status=200)
         else:
-            return Response(message ,mimetype="html/text",status=400)
+            return Response("failed" ,mimetype="html/text",status=400)
 
 
 
@@ -149,7 +149,7 @@ def update():
             }
             return Response(json.dumps(course,default=str) ,mimetype="application/json",status=200)
         else:
-            return Response(message ,mimetype="html/text",status=400)
+            return Response("failed" ,mimetype="html/text",status=400)
 def delete():
 
     data=request.json
@@ -183,4 +183,4 @@ def delete():
         if (rows==1):
             return Response("success" ,mimetype="html/text",status=204)
         else:
-            return Response(message ,mimetype="html/text",status=400)
+            return Response("failed",mimetype="html/text",status=400)

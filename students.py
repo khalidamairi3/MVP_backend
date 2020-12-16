@@ -46,7 +46,7 @@ def get():
                 students.append(student)
             return Response(json.dumps(students,default=str) ,mimetype="application/json",status=200)
         else:
-            return Response(message ,mimetype="html/text",status=400)
+            return Response("failed" ,mimetype="html/text",status=400)
 
 
 

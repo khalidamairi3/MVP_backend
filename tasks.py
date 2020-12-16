@@ -44,7 +44,7 @@ def get():
                 tasks.append(task)
             return Response(json.dumps(tasks,default=str) ,mimetype="application/json",status=201)
         else:
-            return Response(message ,mimetype="html/text",status=400)
+            return Response("failed" ,mimetype="html/text",status=400)
 
 def post():
     data=request.json
@@ -95,7 +95,7 @@ def post():
             }
             return Response(json.dumps(task,default=str) ,mimetype="application/json",status=201)
         else:
-            return Response(message ,mimetype="html/text",status=400)
+            return Response("failed" ,mimetype="html/text",status=400)
 
 def update():
     data=request.json
@@ -151,7 +151,7 @@ def update():
             }
             return Response(json.dumps(task,default=str) ,mimetype="application/json",status=201)
         else:
-            return Response(message ,mimetype="html/text",status=400)
+            return Response("failed" ,mimetype="html/text",status=400)
 
 def delete():
     data=request.json
@@ -187,7 +187,7 @@ def delete():
             
             return Response("Success",mimetype="html/text",status=204)
         else:
-            return Response(message ,mimetype="html/text",status=400)
+            return Response("failed" ,mimetype="html/text",status=400)
 
 
     

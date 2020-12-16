@@ -43,6 +43,7 @@ def get():
                     "studentId":row[1],
                     "taskId":row[2],
                     "date":row[3],
+                    "grade":row[4],
                     "content":row[5],
                     "comment":row[6],
                     "name":row[8]
@@ -50,7 +51,7 @@ def get():
                 submissions.append(submission)
             return Response(json.dumps(submissions,default=str) ,mimetype="application/json",status=200)
         else:
-            return Response(message ,mimetype="html/text",status=400)
+            return Response("failed" ,mimetype="html/text",status=400)
     
 
 
@@ -102,7 +103,7 @@ def post():
             }
             return Response(json.dumps(submission,default=str),mimetype="application/json" , status =201)
         else:
-            return Response(message,mimetype="text/html",status=400)
+            return Response("failed",mimetype="text/html",status=400)
 
 
 def update():
@@ -151,7 +152,7 @@ def update():
             }
             return Response(json.dumps(submission,default=str),mimetype="application/json" , status =201)
         else:
-            return Response(message,mimetype="text/html",status=400)
+            return Response("failed",mimetype="text/html",status=400)
   
             
 
@@ -191,4 +192,4 @@ def delete():
     
             return Response("SUCCESS",mimetype="text/html" , status =201)
         else:
-            return Response(message,mimetype="text/html",status=400)
+            return Response("failed",mimetype="text/html",status=400)

@@ -10,6 +10,7 @@ import student_registers
 import student_submit
 import instructor_teaches
 import tasks
+import grades
 
 from flask_cors import CORS
 app = Flask(__name__)
@@ -92,6 +93,17 @@ def student_submit_api():
         return student_submit.update()
     elif request.method == "DELETE":
         return student_submit.delete()
+@app.route("/api/grades",methods=["GET","POST","PATCH"])
+def grades_api():
+
+    if request.method == "GET":
+        return grades.get()
+    elif request.method=="POST":
+        return grades.post()
+    elif request.method == "PATCH":
+        return grades.post()
+
+
 
 
 

@@ -41,7 +41,7 @@ def post():
         if rows == 1 :
             return Response("success",mimetype="html/text" , status =201)
         else:
-            return Response(message,mimetype="text/html",status=400)
+            return Response("failed",mimetype="text/html",status=400)
   
             
 
@@ -82,4 +82,4 @@ def delete():
         if rows == 1 :
             return Response("success",mimetype="html/text" , status =204)
         else:
-            return Response(message,mimetype="text/html",status=400)
+            return Response("failed",mimetype="text/html",status=400)

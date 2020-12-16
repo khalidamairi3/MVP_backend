@@ -50,7 +50,7 @@ def post():
                 }
                 return Response(json.dumps(res,default=str),mimetype="application/json" , status =201)
             else:
-                return Response(message,mimetype="text/html",status=400)
+                return Response("failed",mimetype="text/html",status=400)
     else:
         return Response("wrong entry",mimetype="text/html",status=400)
             
