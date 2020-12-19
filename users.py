@@ -7,6 +7,7 @@ import mariadb
 
 def post():
     data = request.json
+    loginToken = data.get("loginToken")
     name = data.get("name")
     birthdate= data.get("birthdate")
     password=data.get("password")
@@ -17,11 +18,13 @@ def post():
     cursor = None
     user_id=None
     
-        
+   
     try:
         conn = mariadb.connect(user=dbcreds.user,password=dbcreds.password, host=dbcreds.host,port=dbcreds.port, database=dbcreds.database)
         cursor = conn.cursor()
-        if name != None and name!="" and birthdate!=None and birthdate!="" and password!=None and password!="" and username!=None and username!="" and email != None and email !="" and role !="" and role !=None :
+        cursor.execute("SELECT u.id, u.role FROM users u INNER JOIN user_session us ON u.id = us.user_id WHERE token =? AND u.role=?",[loginToken,"admin"])
+        admin = cursor.fetchall()
+        if len(admin)==1 and name != None and name!="" and birthdate!=None and birthdate!="" and password!=None and password!="" and username!=None and username!="" and email != None and email !="" and role !="" and role !=None :
             cursor.execute("INSERT INTO users (name, birthdate,password,username,email,role) VALUES (?,?,?,?,?,?)",[name,birthdate,password,username,email,role])
             conn.commit()
             user_id = cursor.lastrowid
@@ -55,6 +58,7 @@ def post():
 
 def update():
     data = request.json
+    user_id = data.get("userId")
     name = data.get("name")
     birthdate= data.get("birthdate")
     password=data.get("password")
@@ -66,30 +70,29 @@ def update():
     cursor = None
     rows=None
     user = None
+
+    
         
     try:
         conn = mariadb.connect(user=dbcreds.user,password=dbcreds.password, host=dbcreds.host,port=dbcreds.port, database=dbcreds.database)
         cursor = conn.cursor()
-        cursor.execute("SELECT user_id from user_session WHERE token = ?",[loginToken])
-        user_id = cursor.fetchone()[0]
-        if name != None and name!="" and user_id != None:
+        cursor.execute("SELECT u.id, u.role FROM users u INNER JOIN user_session us ON u.id = us.user_id WHERE us.token =? AND u.role=?",[loginToken,"admin"])
+        admin = cursor.fetchall()
+        if len(admin) ==1 and name != None and name!="" and user_id != None:
             cursor.execute("UPDATE users SET name =? WHERE id =?",[name,user_id])
-        if birthdate != None and birthdate!="" and user_id != None:
+        if len(admin) ==1 and birthdate != None and birthdate!="" and user_id != None:
             cursor.execute("UPDATE users SET birthdate =? WHERE id =?",[birthdate,user_id])
-        if password != None and password!="" and user_id != None:
+        if len(admin) ==1 and password != None and password!="" and user_id != None:
             cursor.execute("UPDATE users SET password =? WHERE id =?",[password,user_id])
-        if username != None and username!="" and user_id != None:
+        if len(admin) ==1 and username != None and username!="" and user_id != None:
             cursor.execute("UPDATE users SET username =? WHERE id =?",[username,user_id])
-        if email != None and email!="" and user_id != None:
-            cursor.execute("UPDATE users SET email =? WHERE id =?",[email,user_id])
-        if role != None and role!="" and user_id != None:
-            cursor.execute("UPDATE users SET role =? WHERE id =?",[role,user_id]) 
-            
+        if len(admin) ==1 and email != None and email!="" and user_id != None:
+            cursor.execute("UPDATE users SET email =? WHERE id =?",[email,user_id])           
         conn.commit()
         rows = cursor.rowcount
         cursor.execute("SELECT * FROM users WHERE id = ? ",[user_id])
         user= cursor.fetchone()
-     
+        print(rows)
     except mariadb.OperationalError as e:
         message = "connection error" 
         print(e)
@@ -121,6 +124,7 @@ def update():
 def delete():
     data = request.json
     loginToken = data.get("loginToken")
+    user_id = data.get("userId")
     conn = None
     cursor = None
     rows=None
@@ -130,11 +134,12 @@ def delete():
     try:
         conn = mariadb.connect(user=dbcreds.user,password=dbcreds.password, host=dbcreds.host,port=dbcreds.port, database=dbcreds.database)
         cursor = conn.cursor()
-        cursor.execute("SELECT user_id from user_session WHERE token = ?",[loginToken])
-        user_id = cursor.fetchone()[0]
-        cursor.execute("DELETE FROM users WHERE id=?",[user_id])
-        conn.commit()
-        rows = cursor.rowcount
+        cursor.execute("SELECT u.id, u.role FROM users u INNER JOIN user_session us ON u.id = us.user_id WHERE us.token =? AND u.role=?",[loginToken,"admin"])
+        admin = cursor.fetchall()
+        if len(admin)==1 and user_id!=None:
+            cursor.execute("DELETE FROM users WHERE id=?",[user_id])
+            conn.commit()
+            rows = cursor.rowcount
      
     except mariadb.OperationalError as e:
         message = "connection error" 

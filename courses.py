@@ -8,8 +8,9 @@ import mariadb
 def get():
     
     params = request.args
-    student_id = params.get("studentId")
-    instructor_id = params.get("instructorId")
+    headers= request.headers
+    loginToken = headers.get("loginToken")
+ 
     conn = None
     cursor = None
     result = None
@@ -17,12 +18,14 @@ def get():
     try:
         conn = mariadb.connect(user=dbcreds.user,password=dbcreds.password, host=dbcreds.host,port=dbcreds.port, database=dbcreds.database)
         cursor = conn.cursor()
-        if student_id != None:
-            cursor.execute("SELECT c.* FROM users u INNER JOIN student_register sr INNER JOIN courses c ON sr.student_id = u.id AND sr.course_id = c.id  WHERE u.id =?",[student_id,])
-        elif instructor_id !=None:
-            cursor.execute("SELECT c.* FROM users u INNER JOIN instructor_teaches it INNER JOIN courses c ON it.instructor_id=u.id AND c.id = it.course_id WHERE u.id =?",[instructor_id])
-        else:
-            cursor.execute("SELECT * FROM courses" )
+        cursor.execute("SELECT u.id , u.role FROM users u INNER JOIN user_session us ON u.id = us.user_id WHERE token = ?",[loginToken])
+        user=cursor.fetchone()
+        if user[1]== "student":
+            cursor.execute("SELECT c.* FROM users u INNER JOIN student_register sr INNER JOIN courses c ON sr.student_id = u.id AND sr.course_id = c.id  WHERE u.id =?",[user[0],])
+        elif user[1] =="instructor":
+            cursor.execute("SELECT c.* FROM users u INNER JOIN instructor_teaches it INNER JOIN courses c ON it.instructor_id=u.id AND c.id = it.course_id WHERE u.id =?",[user[0]])
+        elif user[1] =="admin":
+            cursor.execute("SELECT * FROM courses")
         result = cursor.fetchall()
     except mariadb.OperationalError as e:
         message = "connection error" 
