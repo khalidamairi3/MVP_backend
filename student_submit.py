@@ -8,16 +8,18 @@ def get():
 
     result = None
     params = request.args
-    user_id = params.get("userId")
+    loginToken = request.headers.get("loginToken")
     task_id = params.get("taskId")
     conn = None
     cursor = None
     result = None
-    
+    user_id = None
         
     try:
         conn = mariadb.connect(user=dbcreds.user,password=dbcreds.password, host=dbcreds.host,port=dbcreds.port, database=dbcreds.database)
         cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM user_session WHERE token = ?",[loginToken])
+        user_id = cursor.fetchone()[0]
         if user_id != None:
             cursor.execute("SELECT role FROM users WHERE id =?",[user_id])
             role = cursor.fetchone()
@@ -75,12 +77,18 @@ def post():
             cursor.execute("INSERT INTO student_submit (student_id, task_id,content,comment) VALUES (?,?,?,?)",[user[0][0],task_id,content,comment])
             conn.commit()
             rows=cursor.rowcount
+            cursor.execute("SELECT * FROM student_submit ss INNER JOIN users u ON ss.student_id=u.id WHERE ss.student_id =? AND ss.task_id=?",[user[0][0],task_id])
+            result = cursor.fetchone()
         elif len(user)==1 and task_id!=None and task_id!="" and content !=None and content !="": 
             cursor.execute("INSERT INTO student_submit (student_id, task_id,content) VALUES (?,?,?)",[user[0][0],task_id,content])
             conn.commit()
+            cursor.execute("SELECT * FROM student_submit ss INNER JOIN users u ON ss.student_id=u.id WHERE ss.student_id =? AND ss.task_id=?",[user[0][0],task_id])
+            result = cursor.fetchone()
             rows=cursor.rowcount
+
         else:
             message="invalid entry"
+        
     except mariadb.OperationalError as e:
         message = "connection error or wrong entry"
     except mariadb.IntegrityError as e:
@@ -96,10 +104,13 @@ def post():
             conn.close()
         if rows == 1 :
             submission={
-                "taskId":task_id,
-                "studentId": user[0][0],
-                "content":content,
-                "comment":comment
+                "studentId":result[1],
+                "taskId":result[2],
+                "date":result[3],
+                "grade":result[4],
+                "content":result[5],
+                "comment":result[6],
+                "name":result[8]
             }
             return Response(json.dumps(submission,default=str),mimetype="application/json" , status =201)
         else:
@@ -128,8 +139,8 @@ def update():
             cursor.execute("UPDATE student_submit SET comment = ? WHERE task_id=? and student_id=?",[comment,task_id,user[0][0]])
         conn.commit()
         rows=cursor.rowcount
-        cursor.execute("SELECT * FROM student_submit WHERE task_id=? and student_id=?",[task_id,user[0][0]])
-        row = cursor.fetchone()
+        cursor.execute("SELECT * FROM student_submit ss INNER JOIN users u ON ss.student_id=u.id WHERE ss.student_id =? AND ss.task_id=?",[user[0][0],task_id])
+        result = cursor.fetchone()
     except mariadb.OperationalError as e:
         message = "connection error or wrong entry"
     except mariadb.IntegrityError as e:
@@ -145,10 +156,13 @@ def update():
             conn.close()
         if rows == 1 :
             submission={
-                "taskId":row[2],
-                "studentId": row[1],
-                "content":row[5],
-                "comment":row[6]
+                 "studentId":result[1],
+                "taskId":result[2],
+                "date":result[3],
+                "grade":result[4],
+                "content":result[5],
+                "comment":result[6],
+                "name":result[8]
             }
             return Response(json.dumps(submission,default=str),mimetype="application/json" , status =201)
         else:

@@ -7,6 +7,8 @@ from datetime import date
 
 def get():
     params=request.args
+    headers = request.headers
+    loginToken = headers.get("loginToken")
     course_id = params.get("courseId")
     conn = None
     cursor = None
@@ -14,9 +16,20 @@ def get():
     try:
         conn = mariadb.connect(user=dbcreds.user,password=dbcreds.password, host=dbcreds.host,port=dbcreds.port, database=dbcreds.database)
         cursor = conn.cursor()
-        if course_id !=None and course_id !="":
-            cursor.execute("SELECT * FROM tasks WHERE course_id=?",[course_id,])
+        cursor.execute("SELECT u.id , u.role FROM users u INNER JOIN user_session us ON u.id = us.user_id WHERE token = ?",[loginToken])
+        user=cursor.fetchone()
+        if user[1]=="instructor" and course_id !=None:
+            cursor.execute("SELECT * FROM instructor_teaches WHERE instructor_id=? AND course_id=?",[user[0],course_id])
             rows = cursor.fetchall()
+            if len(rows)==1:
+                cursor.execute("SELECT * FROM tasks WHERE course_id=?",[course_id,])
+        elif user[1]=="student" and course_id !=None and course_id !="":
+            cursor.execute("SELECT * FROM student_register WHERE student_id=? AND course_id=?",[user[0],course_id])
+            rows = cursor.fetchall()
+            if len(rows)==1:
+                cursor.execute("SELECT * FROM tasks WHERE course_id=?",[course_id,])
+                
+        rows = cursor.fetchall()
     except mariadb.OperationalError as e:
         message = "connection error" 
     except Exception as e:

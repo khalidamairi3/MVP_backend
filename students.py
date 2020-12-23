@@ -12,6 +12,7 @@ def get():
     conn = None
     cursor = None
     result = None
+
     
         
     try:
@@ -23,10 +24,15 @@ def get():
             cursor.execute("SELECT * FROM users u INNER JOIN student_register sr  ON sr.student_id = u.id WHERE u.role= ? AND sr.course_id =?",["student",course_id])
         elif user[1]=="admin":
             cursor.execute("SELECT * FROM users WHERE role = ?",["student",])
+        elif user[1]=="instructor" and course_id !=None:
+            cursor.execute("SELECT * FROM instructor_teaches WHERE instructor_id=? AND course_id=?",[user[0],course_id])
+            rows = cursor.fetchall()
+            if len(rows)==1:
+                cursor.execute("SELECT * FROM users u INNER JOIN student_register sr  ON sr.student_id = u.id WHERE u.role= ? AND sr.course_id =?",["student",course_id])
         result = cursor.fetchall()
     except mariadb.OperationalError as e:
         message = "connection error" 
-    except:
+    except Exception as e:
         message ="somthing went wrong, probably bad params " 
     finally:
         if(cursor != None):
